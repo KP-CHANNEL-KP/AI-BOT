@@ -18,9 +18,7 @@ export default {
     const chatId = update.message.chat.id
     const userText = update.message.text.trim()
 
-    // -------------------------
     // /start command
-    // -------------------------
     if (userText === "/start") {
       await fetch(
         `https://api.telegram.org/bot${env.TG_TOKEN}/sendMessage`,
@@ -39,8 +37,8 @@ export default {
     let replyText = "ခဏလေး ပြန်စမ်းကြည့်ပါနော် 🙏"
 
     try {
-      const geminiRes = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
+      const res = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" +
           env.GEMINI_API_KEY,
         {
           method: "POST",
@@ -48,7 +46,6 @@ export default {
           body: JSON.stringify({
             contents: [
               {
-                role: "user",
                 parts: [
                   {
                     text:
@@ -67,17 +64,13 @@ export default {
         }
       )
 
-      const raw = await geminiRes.text()
-      console.log("Gemini status:", geminiRes.status)
-      console.log("Gemini raw:", raw)
-
-      const data = JSON.parse(raw)
+      const data = await res.json()
 
       replyText =
         data?.candidates?.[0]?.content?.parts?.[0]?.text ??
         "Gemini က စာမပြန်ပါ 🙏"
 
-    } catch (err) {
+    } catch {
       replyText = "Gemini API error ဖြစ်နေပါတယ် 🙏"
     }
 
